@@ -60,10 +60,15 @@ const TeacherDashboard = () => {
         }
 
         try {
+            const records = Object.keys(markings).map(studentId => ({
+                studentId,
+                status: markings[studentId]
+            }));
+
             await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/teacher/attendance`, { 
                 classId: selectedClassId, 
                 date,
-                markings 
+                records 
             }, { headers });
             
             setMessage('All Attendance Saved Successfully!');
@@ -143,17 +148,22 @@ const TeacherDashboard = () => {
                                     <table className="beautiful-table" style={{ marginBottom: '2rem' }}>
                                         <thead>
                                             <tr>
+                                                <th>S.No</th>
                                                 <th>Student Name</th>
                                                 <th>Action</th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            {students.map(student => (
+                                            {students.map((student, index) => (
                                                 <tr key={student._id}>
+                                                    <td style={{fontWeight: '600', color: 'var(--text-main)'}}>{index + 1}</td>
                                                     <td>
                                                         <div className="flex items-center gap-2">
                                                             <div style={{width: '30px', height:'30px', borderRadius:'50%', background:'var(--secondary)', color:'var(--secondary-text)', display:'flex', alignItems:'center', justifyContent:'center', fontWeight:'bold', fontSize:'0.75rem'}}>{student.name[0]}</div>
-                                                            <div style={{fontWeight: '600', color: 'var(--text-main)', fontSize: '0.9rem'}}>{student.name}</div>
+                                                            <div>
+                                                                <div style={{fontWeight: '600', color: 'var(--text-main)', fontSize: '0.9rem'}}>{student.name}</div>
+                                                                <div style={{fontSize: '0.75rem', color: 'var(--text-muted)'}}>D/S of {student.fatherName || 'Unknown'}</div>
+                                                            </div>
                                                         </div>
                                                     </td>
                                                     <td>

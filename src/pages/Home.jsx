@@ -53,6 +53,7 @@ const Home = () => {
           <a href="#about">About</a>
           <a href="#gallery">Gallery</a>
           <a href="#contact">Contact</a>
+          <Link to="/dit-registration" className="login-btn" style={{background: 'var(--primary)', color: 'var(--primary-text)', border: '1px solid var(--primary)', marginLeft: '10px'}}>Admission</Link>
           <Link to="/login" className="login-btn">Login</Link>
         </div>
 
@@ -71,6 +72,7 @@ const Home = () => {
           <a href="#about" onClick={closeMenu}>About</a>
           <a href="#gallery" onClick={closeMenu}>Gallery</a>
           <a href="#contact" onClick={closeMenu}>Contact</a>
+          <Link to="/dit-registration" className="login-btn mobile-login-btn" style={{background: 'var(--primary)', color: 'var(--primary-text)', marginTop: '10px'}} onClick={closeMenu}>Apply for Admission</Link>
           <Link to="/login" className="login-btn mobile-login-btn" onClick={closeMenu}>Login</Link>
         </div>
       </nav>
@@ -94,7 +96,10 @@ const Home = () => {
             Empowering students with excellent education, modern facilities, 
             and a track record of success. Join us to build your bright future.
           </p>
-          <a href="#gallery" className="cta-btn pulse-animation" data-aos="zoom-in" data-aos-delay="800">Explore Our Campus</a>
+          <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
+            <Link to="/dit-registration" className="cta-btn pulse-animation" style={{ background: 'var(--primary)', color: 'var(--primary-text)' }} data-aos="zoom-in" data-aos-delay="700">Apply for Admission</Link>
+            <a href="#gallery" className="cta-btn" data-aos="zoom-in" data-aos-delay="800">Explore Our Campus</a>
+          </div>
         </div>
       </section>
 

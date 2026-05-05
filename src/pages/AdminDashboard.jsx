@@ -1,7 +1,7 @@
 import { useState, useEffect, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import axios from 'axios';
-import { LayoutDashboard, Users, GraduationCap, CalendarCheck, School, LogOut, Search, Bell, Settings } from 'lucide-react';
+import { LayoutDashboard, Users, GraduationCap, CalendarCheck, School, LogOut, Search, Bell, Settings, ClipboardList } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart, Line, CartesianGrid } from 'recharts';
 
 const mockPerformance = [
@@ -29,6 +29,7 @@ const AdminDashboard = () => {
     const [teachers, setTeachers] = useState([]);
     const [students, setStudents] = useState([]);
     const [attendances, setAttendances] = useState([]);
+    const [ditRegistrations, setDitRegistrations] = useState([]);
 
     const [classForm, setClassForm] = useState({ name: '', timing: '' });
     const [form, setForm] = useState({ name: '', fatherName: '', email: '', password: '', assignedClass: '', assignedClasses: [] });
@@ -59,6 +60,9 @@ const AdminDashboard = () => {
             }
             if (view === 'attendance' || view === 'dashboard') {
                 axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/admin/attendance`, { headers }).then(res => setAttendances(res.data));
+            }
+            if (view === 'dit-registrations') {
+                axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/admin/dit-registrations`, { headers }).then(res => setDitRegistrations(res.data));
             }
         } catch (err) {
             console.error(err);
@@ -180,6 +184,7 @@ const AdminDashboard = () => {
                 <div className={`nav-item ${view==='teachers'?'active':''}`} onClick={()=>setView('teachers')}><Users size={20}/> <span>Teachers</span></div>
                 <div className={`nav-item ${view==='classes'?'active':''}`} onClick={()=>setView('classes')}><School size={20}/> <span>Classes</span></div>
                 <div className={`nav-item ${view==='attendance'?'active':''}`} onClick={()=>setView('attendance')}><CalendarCheck size={20}/> <span>Attendance Tracker</span></div>
+                <div className={`nav-item ${view==='dit-registrations'?'active':''}`} onClick={()=>setView('dit-registrations')}><ClipboardList size={20}/> <span>DIT Registrations</span></div>
                 
                 <div style={{marginTop: 'auto'}}>
                     <div className="nav-item" onClick={logout} style={{color: 'var(--danger-text)'}}><LogOut size={20}/> <span>Logout</span></div>
@@ -498,6 +503,41 @@ const AdminDashboard = () => {
                                                             color: record.status === 'Present' ? 'var(--success-text)' : record.status === 'Absent' ? 'var(--danger-text)' : 'var(--warning-text)'
                                                         }}>{record.status}</span>
                                                     </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            )}
+                        </div>
+                    )}
+
+                    {view === 'dit-registrations' && (
+                        <div className="card w-full">
+                            <h1 style={{fontSize: '1.5rem', fontWeight: '700', marginBottom: '1.5rem'}}>DIT Batch 36 Registrations</h1>
+                            
+                            {ditRegistrations.length === 0 ? (
+                                <p style={{ color: 'var(--text-muted)' }}>No registrations found yet.</p>
+                            ) : (
+                                <div style={{overflowX: 'auto'}}>
+                                    <table className="beautiful-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Student Name</th>
+                                                <th>Father's Name</th>
+                                                <th>Contact</th>
+                                                <th>Address</th>
+                                                <th>Registration Date</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {ditRegistrations.map(reg => (
+                                                <tr key={reg._id}>
+                                                    <td style={{fontWeight: '600'}}>{reg.name}</td>
+                                                    <td>{reg.fatherName}</td>
+                                                    <td>{reg.contactNumber}</td>
+                                                    <td>{reg.address}</td>
+                                                    <td>{new Date(reg.createdAt).toLocaleDateString()}</td>
                                                 </tr>
                                             ))}
                                         </tbody>

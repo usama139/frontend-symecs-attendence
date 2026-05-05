@@ -5,6 +5,7 @@ import Home from './pages/Home';
 import Login from './pages/Login';
 import AdminDashboard from './pages/AdminDashboard';
 import TeacherDashboard from './pages/TeacherDashboard';
+import DITRegistration from './pages/DITRegistration';
 import './index.css';
 
 const PrivateRoute = ({ children, roleRequired }) => {
@@ -24,6 +25,7 @@ function App() {
       <div className="app-container">
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/dit-registration" element={<DITRegistration />} />
           <Route path="/login" element={<Login />} />
           <Route path="/admin/*" element={
             <PrivateRoute roleRequired="Admin">

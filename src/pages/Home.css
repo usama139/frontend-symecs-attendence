@@ -368,7 +368,7 @@ h1, h2, h3, h4, h5, h6 {
 /* WhatsApp Floating Button */
 .whatsapp-float {
   position: fixed;
-  bottom: 30px;
+  bottom: 100px;
   right: 30px;
   background: #25d366;
   color: #fff;

@@ -4,6 +4,7 @@ import AOS from 'aos';
 import 'aos/dist/aos.css';
 import './Home.css';
 import mediaList from '../assets/media-list.json';
+import Chatbot from '../components/Chatbot';
 
 const Home = () => {
   // Filter media for the gallery
@@ -214,6 +215,9 @@ const Home = () => {
           Developed by Usama Ali, HOD Symecs Institute
         </p>
       </footer>
+
+      {/* AI Chatbot */}
+      <Chatbot />
     </div>
   );
 };

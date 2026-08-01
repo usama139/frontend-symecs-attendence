@@ -1,5 +1,4 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { ChatWidget } from 'pluginai-react';
 import { useContext } from 'react';
 import { AuthContext } from './context/AuthContext';
 import Home from './pages/Home';
@@ -39,12 +38,7 @@ function App() {
             </PrivateRoute>
           } />
         </Routes>
-        <ChatWidget
-          apiKey="your-api-key"
-          workspace="your-workspace"
-          title="Symecs Support"
-          primaryColor="#7c6df0"
-        />
+
       </div>
     </Router>
   );

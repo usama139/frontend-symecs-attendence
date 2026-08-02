@@ -1,6 +1,33 @@
 /* Chatbot.css */
 
-/* ── Floating Chat Button ─────────────────────────────────── */
+/* ── Plugin AI Container Positioning ────────────────────────────── */
+.pluginai-wrapper {
+  position: fixed;
+  bottom: 25px;
+  left: 25px;
+  z-index: 9999;
+}
+
+.pluginai-wrapper iframe,
+.pluginai-wrapper > div,
+.pluginai-wrapper button {
+  left: 25px !important;
+  right: auto !important;
+}
+
+@media (max-width: 768px) {
+  .pluginai-wrapper {
+    bottom: 20px;
+    left: 15px;
+  }
+  .pluginai-wrapper iframe,
+  .pluginai-wrapper > div,
+  .pluginai-wrapper button {
+    left: 15px !important;
+    right: auto !important;
+  }
+}
+
 .chatbot-float-btn {
   position: fixed;
   bottom: 100px;

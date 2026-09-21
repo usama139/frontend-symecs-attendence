@@ -41,6 +41,7 @@ const AdminDashboard = () => {
   const [teacherForm, setTeacherForm] = useState({ name: '', email: '', password: '', assignedClasses: [] });
   const [studentForm, setStudentForm] = useState({ name: '', fatherName: '', email: '', password: '', assignedClass: '' });
 
+  const [editingClassId, setEditingClassId] = useState(null);
   const [editingTeacherId, setEditingTeacherId] = useState(null);
   const [editingStudentId, setEditingStudentId] = useState(null);
   const [message, setMessage] = useState({ type: '', text: '' });
@@ -82,17 +83,42 @@ const AdminDashboard = () => {
     setTimeout(() => setMessage({ type: '', text: '' }), 4000);
   };
 
-  // --- Add Class ---
-  const handleCreateClass = async (e) => {
+  // --- Class Add/Update/Delete ---
+  const handleSaveClass = async (e) => {
     e.preventDefault();
     try {
       const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-      await axios.post(`${apiUrl}/api/admin/classes`, classForm, { headers });
-      showMsg('success', `Class "${classForm.name}" added successfully!`);
+      if (editingClassId) {
+        await axios.put(`${apiUrl}/api/admin/classes/${editingClassId}`, classForm, { headers });
+        showMsg('success', `Class details updated successfully!`);
+      } else {
+        await axios.post(`${apiUrl}/api/admin/classes`, classForm, { headers });
+        showMsg('success', `Class "${classForm.name}" added successfully!`);
+      }
       setClassForm({ name: '', timing: '10:00 AM - 11:30 AM' });
+      setEditingClassId(null);
       fetchData();
     } catch (err) {
-      showMsg('error', err.response?.data?.msg || 'Error adding class');
+      showMsg('error', err.response?.data?.msg || 'Error saving class');
+    }
+  };
+
+  const handleEditClass = (c) => {
+    setEditingClassId(c._id);
+    setClassForm({ name: c.name, timing: c.timing });
+    setView('classes');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleDeleteClass = async (id) => {
+    if (!window.confirm('Are you sure you want to delete this class? This will also unassign it from enrolled students and teachers.')) return;
+    try {
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+      await axios.delete(`${apiUrl}/api/admin/classes/${id}`, { headers });
+      showMsg('success', 'Class removed successfully');
+      fetchData();
+    } catch (err) {
+      showMsg('error', 'Error removing class');
     }
   };
 
@@ -245,9 +271,9 @@ const AdminDashboard = () => {
       return;
     }
 
-    let csvContent = "data:text/csv;charset=utf-8,S.No,Student Name,Class,Date,Status,Marked By\n";
+    let csvContent = "data:text/csv;charset=utf-8,S.No,Student Name,Father's Name,Class,Date,Status,Marked By\n";
     filteredAttendances.forEach((rec, idx) => {
-      const row = `${idx + 1},"${rec.studentId?.name || 'N/A'}","${rec.classId?.name || 'N/A'}",${rec.date},${rec.status},"${rec.markedBy?.name || 'Faculty'}"`;
+      const row = `${idx + 1},"${rec.studentId?.name || 'N/A'}","${rec.studentId?.fatherName || 'N/A'}","${rec.classId?.name || 'N/A'}",${rec.date},${rec.status},"${rec.markedBy?.name || 'Faculty'}"`;
       csvContent += row + "\n";
     });
 
@@ -269,6 +295,7 @@ const AdminDashboard = () => {
 
   const filteredStudentsList = students.filter(s => 
     s.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+    (s.fatherName && s.fatherName.toLowerCase().includes(searchTerm.toLowerCase())) ||
     (s.email && s.email.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
@@ -487,7 +514,7 @@ const AdminDashboard = () => {
                     <School size={18} className="text-cyan-400" />
                     <span>Quick Create Class</span>
                   </h3>
-                  <form onSubmit={handleCreateClass} className="space-y-3">
+                  <form onSubmit={handleSaveClass} className="space-y-3">
                     <input
                       type="text"
                       placeholder="e.g. DIT Batch 36"
@@ -505,7 +532,7 @@ const AdminDashboard = () => {
                       required
                     />
                     <button type="submit" className="w-full py-2.5 font-bold text-xs text-white bg-gradient-to-r from-blue-600 to-cyan-500 rounded-xl shadow-md">
-                      Add New Class
+                      {editingClassId ? 'Update Class' : 'Add New Class'}
                     </button>
                   </form>
                 </div>
@@ -520,9 +547,25 @@ const AdminDashboard = () => {
                           <p className="font-bold text-white">{c.name}</p>
                           <p className="text-[11px] text-slate-400">{c.timing}</p>
                         </div>
-                        <span className="px-3 py-1 rounded-full bg-cyan-500/10 text-cyan-300 font-bold border border-cyan-500/20">
-                          {c.totalStudents || 0} Students
-                        </span>
+                        <div className="flex items-center gap-2">
+                          <span className="px-3 py-1 rounded-full bg-cyan-500/10 text-cyan-300 font-bold border border-cyan-500/20">
+                            {c.totalStudents || 0} Students
+                          </span>
+                          <button
+                            onClick={() => handleEditClass(c)}
+                            className="p-1.5 rounded-lg bg-slate-800 text-cyan-400 hover:bg-slate-700 transition"
+                            title="Edit Class"
+                          >
+                            <Edit size={14} />
+                          </button>
+                          <button
+                            onClick={() => handleDeleteClass(c._id)}
+                            className="p-1.5 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20 transition"
+                            title="Delete Class"
+                          >
+                            <Trash2 size={14} />
+                          </button>
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -536,8 +579,10 @@ const AdminDashboard = () => {
           {view === 'classes' && (
             <div className="space-y-6">
               <div className="p-6 rounded-3xl bg-slate-900 border border-slate-800">
-                <h3 className="text-lg font-bold text-white mb-4">Add New Class / Batch</h3>
-                <form onSubmit={handleCreateClass} className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <h3 className="text-lg font-bold text-white mb-4">
+                  {editingClassId ? 'Edit Class Details' : 'Add New Class / Batch'}
+                </h3>
+                <form onSubmit={handleSaveClass} className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <input
                     type="text"
                     placeholder="Class Name (e.g. AI Batch 1)"
@@ -554,9 +599,23 @@ const AdminDashboard = () => {
                     className="px-4 py-3 bg-slate-950 border border-slate-700/80 rounded-xl text-xs text-white focus:outline-none focus:border-cyan-400"
                     required
                   />
-                  <button type="submit" className="py-3 font-bold text-xs text-white bg-gradient-to-r from-blue-600 to-cyan-500 rounded-xl shadow-md">
-                    + Add Class
-                  </button>
+                  <div className="flex gap-2">
+                    <button type="submit" className="flex-1 py-3 font-bold text-xs text-white bg-gradient-to-r from-blue-600 to-cyan-500 rounded-xl shadow-md">
+                      {editingClassId ? 'Update Class' : '+ Add Class'}
+                    </button>
+                    {editingClassId && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setEditingClassId(null);
+                          setClassForm({ name: '', timing: '10:00 AM - 11:30 AM' });
+                        }}
+                        className="px-3 py-3 font-bold text-xs text-slate-400 bg-slate-800 hover:bg-slate-700 rounded-xl transition"
+                      >
+                        Cancel
+                      </button>
+                    )}
+                  </div>
                 </form>
               </div>
 
@@ -569,6 +628,7 @@ const AdminDashboard = () => {
                       <th className="py-3 px-4">Class Name</th>
                       <th className="py-3 px-4">Timing</th>
                       <th className="py-3 px-4">Enrolled Students</th>
+                      <th className="py-3 px-4 text-right">Actions</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-800/60 text-slate-200 font-medium">
@@ -581,6 +641,24 @@ const AdminDashboard = () => {
                           <span className="px-2.5 py-1 rounded-full bg-cyan-500/10 text-cyan-300 font-bold">
                             {c.totalStudents || 0} Students
                           </span>
+                        </td>
+                        <td className="py-3.5 px-4 text-right">
+                          <div className="flex items-center justify-end gap-2">
+                            <button
+                              onClick={() => handleEditClass(c)}
+                              className="p-1.5 rounded-lg bg-slate-800 text-cyan-400 hover:bg-slate-700 transition"
+                              title="Edit Class"
+                            >
+                              <Edit size={16} />
+                            </button>
+                            <button
+                              onClick={() => handleDeleteClass(c._id)}
+                              className="p-1.5 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20 transition"
+                              title="Delete Class"
+                            >
+                              <Trash2 size={16} />
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     ))}
@@ -923,6 +1001,7 @@ const AdminDashboard = () => {
                       <tr>
                         <th className="py-3 px-4">#</th>
                         <th className="py-3 px-4">Student Name</th>
+                        <th className="py-3 px-4">Father's Name</th>
                         <th className="py-3 px-4">Class</th>
                         <th className="py-3 px-4">Date</th>
                         <th className="py-3 px-4">Status</th>
@@ -933,6 +1012,7 @@ const AdminDashboard = () => {
                         <tr key={rec._id || idx} className="hover:bg-slate-800/40 transition">
                           <td className="py-3.5 px-4">{idx + 1}</td>
                           <td className="py-3.5 px-4 font-bold text-white">{rec.studentId?.name || 'Student'}</td>
+                          <td className="py-3.5 px-4 text-slate-300">{rec.studentId?.fatherName || 'N/A'}</td>
                           <td className="py-3.5 px-4">{rec.classId?.name || 'Class'}</td>
                           <td className="py-3.5 px-4 text-slate-300">{rec.date}</td>
                           <td className="py-3.5 px-4">

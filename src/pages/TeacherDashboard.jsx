@@ -490,6 +490,7 @@ const TeacherDashboard = () => {
                       <tr>
                         <th className="py-3 px-4">#</th>
                         <th className="py-3 px-4">Student Name</th>
+                        <th className="py-3 px-4">Father's Name</th>
                         <th className="py-3 px-4">Class</th>
                         <th className="py-3 px-4">Session Date</th>
                         <th className="py-3 px-4">Status</th>
@@ -500,6 +501,7 @@ const TeacherDashboard = () => {
                         <tr key={rec._id || idx} className="hover:bg-slate-800/40 transition">
                           <td className="py-3.5 px-4">{idx + 1}</td>
                           <td className="py-3.5 px-4 font-bold text-white">{rec.studentId?.name || 'Student'}</td>
+                          <td className="py-3.5 px-4 text-slate-300">{rec.studentId?.fatherName || 'N/A'}</td>
                           <td className="py-3.5 px-4">{rec.classId?.name || 'Class'}</td>
                           <td className="py-3.5 px-4 text-slate-300">{rec.date}</td>
                           <td className="py-3.5 px-4">

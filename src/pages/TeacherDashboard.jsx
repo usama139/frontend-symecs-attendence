@@ -429,7 +429,7 @@ const TeacherDashboard = () => {
                     </p>
 
                     <button
-                      onClick={submitAllAttendance}
+                      onClick={handleSaveAttendance}
                       disabled={isSaving}
                       className="px-8 py-3.5 font-bold text-xs text-white bg-gradient-to-r from-blue-600 via-cyan-500 to-emerald-400 rounded-xl shadow-lg shadow-cyan-500/25 hover:opacity-95 transition flex items-center gap-2"
                     >

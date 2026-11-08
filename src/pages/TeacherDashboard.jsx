@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import axios from 'axios';
+import { API_BASE_URL } from '../config/api';
 import { 
   ClipboardList, 
   History, 
@@ -48,8 +49,7 @@ const TeacherDashboard = () => {
 
   const fetchTeacherClasses = async () => {
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-      const res = await axios.get(`${apiUrl}/api/teacher/classes`, { headers });
+      const res = await axios.get(`${API_BASE_URL}/api/teacher/classes`, { headers });
       setClasses(res.data);
       if (res.data.length > 0) {
         setSelectedClassId(res.data[0]._id);
@@ -60,20 +60,18 @@ const TeacherDashboard = () => {
   };
 
   useEffect(() => {
-    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-    
     if (view === 'history') {
-      axios.get(`${apiUrl}/api/teacher/attendance`, { headers })
+      axios.get(`${API_BASE_URL}/api/teacher/attendance`, { headers })
         .then(res => setAttendances(res.data))
         .catch(console.error);
     } else if (view === 'mark' && selectedClassId) {
       // Fetch students for selected class
-      axios.get(`${apiUrl}/api/teacher/classes/${selectedClassId}/students`, { headers })
+      axios.get(`${API_BASE_URL}/api/teacher/classes/${selectedClassId}/students`, { headers })
         .then(res => setStudents(res.data))
         .catch(console.error);
            
       // Fetch existing attendance marked today
-      axios.get(`${apiUrl}/api/teacher/attendance`, { headers })
+      axios.get(`${API_BASE_URL}/api/teacher/attendance`, { headers })
         .then(res => {
           const existing = res.data.filter(a => a.classId?._id === selectedClassId && a.date === date);
           const initialMarks = {};
@@ -121,8 +119,7 @@ const TeacherDashboard = () => {
 
     setIsSaving(true);
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-      await axios.post(`${apiUrl}/api/teacher/attendance`, {
+      await axios.post(`${API_BASE_URL}/api/teacher/attendance`, {
         classId: selectedClassId,
         date,
         records

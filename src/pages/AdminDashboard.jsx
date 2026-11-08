@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import axios from 'axios';
+import { API_BASE_URL } from '../config/api';
 import { 
   LayoutDashboard, 
   Users, 
@@ -59,13 +60,12 @@ const AdminDashboard = () => {
 
   const fetchData = async () => {
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
       const [cRes, tRes, sRes, aRes, dRes] = await Promise.all([
-        axios.get(`${apiUrl}/api/admin/classes`, { headers }),
-        axios.get(`${apiUrl}/api/admin/teachers`, { headers }),
-        axios.get(`${apiUrl}/api/admin/students`, { headers }),
-        axios.get(`${apiUrl}/api/admin/attendance`, { headers }),
-        axios.get(`${apiUrl}/api/admin/dit-registrations`, { headers })
+        axios.get(`${API_BASE_URL}/api/admin/classes`, { headers }),
+        axios.get(`${API_BASE_URL}/api/admin/teachers`, { headers }),
+        axios.get(`${API_BASE_URL}/api/admin/students`, { headers }),
+        axios.get(`${API_BASE_URL}/api/admin/attendance`, { headers }),
+        axios.get(`${API_BASE_URL}/api/admin/dit-registrations`, { headers })
       ]);
       setClasses(cRes.data);
       setTeachers(tRes.data);
@@ -87,12 +87,11 @@ const AdminDashboard = () => {
   const handleSaveClass = async (e) => {
     e.preventDefault();
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
       if (editingClassId) {
-        await axios.put(`${apiUrl}/api/admin/classes/${editingClassId}`, classForm, { headers });
+        await axios.put(`${API_BASE_URL}/api/admin/classes/${editingClassId}`, classForm, { headers });
         showMsg('success', `Class details updated successfully!`);
       } else {
-        await axios.post(`${apiUrl}/api/admin/classes`, classForm, { headers });
+        await axios.post(`${API_BASE_URL}/api/admin/classes`, classForm, { headers });
         showMsg('success', `Class "${classForm.name}" added successfully!`);
       }
       setClassForm({ name: '', timing: '10:00 AM - 11:30 AM' });
@@ -113,8 +112,7 @@ const AdminDashboard = () => {
   const handleDeleteClass = async (id) => {
     if (!window.confirm('Are you sure you want to delete this class? This will also unassign it from enrolled students and teachers.')) return;
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-      await axios.delete(`${apiUrl}/api/admin/classes/${id}`, { headers });
+      await axios.delete(`${API_BASE_URL}/api/admin/classes/${id}`, { headers });
       showMsg('success', 'Class removed successfully');
       fetchData();
     } catch (err) {
@@ -126,12 +124,11 @@ const AdminDashboard = () => {
   const handleSaveTeacher = async (e) => {
     e.preventDefault();
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
       if (editingTeacherId) {
-        await axios.put(`${apiUrl}/api/admin/teachers/${editingTeacherId}`, teacherForm, { headers });
+        await axios.put(`${API_BASE_URL}/api/admin/teachers/${editingTeacherId}`, teacherForm, { headers });
         showMsg('success', 'Teacher profile updated!');
       } else {
-        await axios.post(`${apiUrl}/api/admin/teachers`, teacherForm, { headers });
+        await axios.post(`${API_BASE_URL}/api/admin/teachers`, teacherForm, { headers });
         showMsg('success', 'New teacher onboarded successfully!');
       }
       setTeacherForm({ name: '', email: '', password: '', assignedClasses: [] });
@@ -156,8 +153,7 @@ const AdminDashboard = () => {
   const handleDeleteTeacher = async (id) => {
     if (!window.confirm('Are you sure you want to remove this teacher?')) return;
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-      await axios.delete(`${apiUrl}/api/admin/teachers/${id}`, { headers });
+      await axios.delete(`${API_BASE_URL}/api/admin/teachers/${id}`, { headers });
       showMsg('success', 'Teacher removed');
       fetchData();
     } catch (err) {
@@ -180,7 +176,6 @@ const AdminDashboard = () => {
   const handleSaveStudent = async (e) => {
     e.preventDefault();
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
       const payload = { ...studentForm };
       
       if (!editingStudentId) {
@@ -197,10 +192,10 @@ const AdminDashboard = () => {
       }
 
       if (editingStudentId) {
-        await axios.put(`${apiUrl}/api/admin/students/${editingStudentId}`, payload, { headers });
+        await axios.put(`${API_BASE_URL}/api/admin/students/${editingStudentId}`, payload, { headers });
         showMsg('success', 'Student record updated!');
       } else {
-        await axios.post(`${apiUrl}/api/admin/students`, payload, { headers });
+        await axios.post(`${API_BASE_URL}/api/admin/students`, payload, { headers });
         showMsg('success', 'Student enrolled successfully!');
       }
       setStudentForm({ name: '', fatherName: '', email: '', password: '', assignedClass: '' });
@@ -226,8 +221,7 @@ const AdminDashboard = () => {
   const handleDeleteStudent = async (id) => {
     if (!window.confirm('Are you sure you want to delete this student?')) return;
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-      await axios.delete(`${apiUrl}/api/admin/students/${id}`, { headers });
+      await axios.delete(`${API_BASE_URL}/api/admin/students/${id}`, { headers });
       showMsg('success', 'Student removed');
       fetchData();
     } catch (err) {
@@ -238,8 +232,7 @@ const AdminDashboard = () => {
   const handleDeleteDITRegistration = async (id, name) => {
     if (!window.confirm(`Are you sure you want to delete the online application for "${name}"?`)) return;
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-      await axios.delete(`${apiUrl}/api/admin/dit-registrations/${id}`, { headers });
+      await axios.delete(`${API_BASE_URL}/api/admin/dit-registrations/${id}`, { headers });
       showMsg('success', 'Online application deleted successfully!');
       fetchData();
     } catch (err) {
@@ -256,8 +249,7 @@ const AdminDashboard = () => {
     }
 
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-      const res = await axios.post(`${apiUrl}/api/admin/clear-attendance`, { classId: filterClass }, { headers });
+      const res = await axios.post(`${API_BASE_URL}/api/admin/clear-attendance`, { classId: filterClass }, { headers });
       showMsg('success', res.data?.msg || `Attendance history for "${selectedClassName}" cleared successfully!`);
       fetchData();
     } catch (err) {

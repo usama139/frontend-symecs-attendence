@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { User, Phone, MapPin, GraduationCap, CheckCircle2, AlertCircle, Sparkles, Send } from 'lucide-react';
+import { API_BASE_URL } from '../config/api';
 
 const AdmissionForm = ({ preselectedCourse = '' }) => {
   const [formData, setFormData] = useState({
@@ -54,8 +55,7 @@ const AdmissionForm = ({ preselectedCourse = '' }) => {
     }
 
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-      await axios.post(`${apiUrl}/api/registration/dit`, {
+      await axios.post(`${API_BASE_URL}/api/registration/dit`, {
         name: formData.fullName,
         fatherName: formData.fatherName,
         contactNumber: formData.phone,
